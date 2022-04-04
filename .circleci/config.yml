@@ -30,9 +30,15 @@ jobs:
           command: |
             echo "$NX_BASE"
             echo "$NX_HEAD"
-      - run: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=lint --parallel=3
-      - run: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=build --parallel=3
-      - run: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=test --parallel=2
+      - run:
+          name: Run lint
+          command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=lint --parallel=3
+      - run:
+          name: Run build
+          command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=build --parallel=3
+      - run:
+          name: Run test
+          command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=test --parallel=2
       - run: npx nx-cloud stop-all-agents
 
 workflows:
