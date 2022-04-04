@@ -12,8 +12,11 @@ jobs:
         type: integer
     steps:
       - checkout
-      - run: npm ci
       - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Start the agent << parameters.ordinal >>
           command: npx nx-cloud start-agent
           no_output_timeout: 60m
   main:
@@ -23,7 +26,9 @@ jobs:
       NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
     steps:
       - checkout
-      - run: npm ci
+      - run:
+          name: Install dependencies
+          command: npm ci
       - nx/set-shas:
           main-branch-name: 'main'
       - run:
@@ -39,7 +44,9 @@ jobs:
       - run:
           name: Run test
           command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=test --parallel=2
-      - run: npx nx-cloud stop-all-agents
+      - run:
+          name: Stop all agents
+          command: npx nx-cloud stop-all-agents
 
 workflows:
   moje-ime:
