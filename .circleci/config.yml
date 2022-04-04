@@ -1,0 +1,45 @@
+version: 2.1
+
+orbs:
+  nx: nrwl/nx@1.3.0
+
+jobs:
+  agent:
+    docker:
+      - image: cimg/node:lts-browsers
+    parameters:
+      ordinal:
+        type: integer
+    steps:
+      - checkout
+      - run: npm ci
+      - run:
+          command: npx nx-cloud start-agent
+          no_output_timeout: 60m
+  main:
+    docker:
+      - image: cimg/node:lts-browsers
+    environment:
+      NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
+    steps:
+      - checkout
+      - run: npm ci
+      - nx/set-shas:
+          main-branch-name: 'main'
+      - run:
+          command: |
+            echo "$NX_BASE"
+            echo "$NX_HEAD"
+      - run: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=lint --parallel=3
+      - run: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=build --parallel=3
+      - run: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=test --parallel=2
+      - run: npx nx-cloud stop-all-agents
+
+workflows:
+  moje-ime:
+    jobs:
+      - agent:
+          matrix:
+            parameters:
+              ordinal: [1, 2, 3]
+      - main
