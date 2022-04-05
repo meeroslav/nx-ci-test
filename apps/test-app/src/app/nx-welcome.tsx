@@ -420,7 +420,7 @@ export function NxWelcome({ title }: { title: string }) {
               <span> Hello there, </span>
               Welcome {title} 👋
             </h1>
-            <h2>Trigger a change 2</h2>
+            <h2>Trigger a change 5</h2>
           </div>
 
           <div id="hero" className="rounded">
