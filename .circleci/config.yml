@@ -40,10 +40,6 @@ jobs:
       - nx/set-shas:
           main-branch-name: 'main'
       - run:
-          command: |
-            echo "$NX_BASE"
-            echo "$NX_HEAD"
-      - run:
           name: Initialize the Nx Cloud distributed CI run
           command: npx nx-cloud start-ci-run
       - run:
