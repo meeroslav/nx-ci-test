@@ -1,12 +1,11 @@
 name: CI
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-
-jobs:
-  main:
-    name: Nx Cloud - Main Job
-    uses: meeroslav/nx-ci-test/.github/workflows/test.yml@main
+# jobs:
+#   main:
+#     name: Nx Cloud - Main Job
+#     uses: meeroslav/nx-ci-test/.github/workflows/test.yml@main
