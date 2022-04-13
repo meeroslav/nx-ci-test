@@ -51,15 +51,21 @@ jobs:
           version: ${{ inputs.pnpm-version || 'latest' }}
 
       - name: Print node/npm/yarn versions
-        id: print-versions
+        id: versions
         run: |
-          node_version="$( node --version )"
-          echo "Node: ${node_version:2}"
+          node_ver=$( node --version )
+          yarn_ver=$( yarn --version || true )
+          pnpm_ver=$( pnpm --version || true )
+
+          echo "Node: ${node_ver:1}"
           echo "NPM: $( npm --version )"
-          echo "Yarn: $( yarn --version )" || true
-          echo "PNPM: $( pnpm --version )" || true
-          echo "::set-output name=package_manager::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yml ]] && echo "pnpm") || echo "npm")"
+          if [[ $yarn_ver != '' ]]; then echo "Yarn: $yarn_ver"; fi
+          if [[ $pnpm_ver != '' ]]; then echo "PNPM: $pnpm_ver"; fi
+
+          echo "::set-output name=node_version::${node_ver:1}"
+          echo "::set-output name=package_manager::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
       - name: What PM
         run: |
-          echo "Package Manager Used ${{ steps.print-versions.outputs.package_manager }}"
+          echo "Package Manager Used: ${{ steps.versions.outputs.package_manager }}"
+          echo "Node version: ${{ steps.versions.outputs.node_version }}"
