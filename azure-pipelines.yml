@@ -26,27 +26,36 @@ jobs:
   - job: agents
     strategy:
       matrix:
-        agent: [1, 2, 3]
-    displayName: 'Agent $(imageName)'
+        first:
+          ordinal: 1
+        second:
+          ordinal: 2
+        third:
+          ordinal: 3
+    displayName: 'Agent $(ordinal)'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
+      - script: npm install --prefix=$HOME/.local -g pnpm@6.32.4
+        displayName: Install PNPM
       - script: pnpm install --frozen-lockfile
         displayName: NPM Install Dependencies
       - script: pnpm exec nx-cloud start-agent
-        displayName: 'Start Nx-Cloud agent $(imageName)'
+        displayName: 'Start Nx-Cloud agent $(ordinal)'
 
   - job: main
     pool:
       vmImage: 'ubuntu-latest'
     steps:
+      - script: npm install --prefix=$HOME/.local -g pnpm@6.32.4
+        displayName: Install PNPM
       - script: pnpm install --frozen-lockfile
         displayName: NPM Install Dependencies
       - script: pnpm exec nx-cloud start-ci-run
         displayName: Start CI run
       - script: pnpm exec nx workspace-lint
         displayName: Run workspace lint
-      - script: pnpm exec nx format:check
+      - script: pnpm exec nx format:check --base=$(BASE_SHA)
         displayName: Check format
       - script: pnpm exec nx affected --base=$(BASE_SHA) --target=lint --parallel=3
         displayName: Run lint
