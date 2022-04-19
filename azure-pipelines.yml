@@ -21,12 +21,14 @@ variables:
       value: $(git merge-base $(TARGET_BRANCH) HEAD)
     ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
       value: $(git rev-parse HEAD~1)
+  - name: HEAD_SHA
+    value: $(git rev-parse HEAD)
 
 jobs:
   - job: agents
     strategy:
       parallel: 3
-    displayName: 'Agent'
+    displayName: 'Nx Cloud Agent'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -38,6 +40,7 @@ jobs:
         displayName: 'Start Nx-Cloud agent'
 
   - job: main
+    displayName: 'Nx Cloud Main'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -49,13 +52,13 @@ jobs:
         displayName: Start CI run
       - script: pnpm exec nx workspace-lint
         displayName: Run workspace lint
-      - script: pnpm exec nx format:check --base=$(BASE_SHA)
+      - script: pnpm exec nx format:check --base=$(BASE_SHA) --head=$(HEAD_SHA)
         displayName: Check format
-      - script: pnpm exec nx affected --base=$(BASE_SHA) --target=lint --parallel=3
+      - script: pnpm exec nx affected --base=$(BASE_SHA) --head=$(HEAD_SHA) --target=lint --parallel=3
         displayName: Run lint
-      - script: pnpm exec nx affected --base=$(BASE_SHA) --target=test --parallel=3 --ci --code-coverage
+      - script: pnpm exec nx affected --base=$(BASE_SHA) --head=$(HEAD_SHA) --target=test --parallel=3 --ci --code-coverage
         displayName: Run test
-      - script: pnpm exec nx affected --base=$(BASE_SHA) --target=build --parallel=3
+      - script: pnpm exec nx affected --base=$(BASE_SHA) --head=$(HEAD_SHA) --target=build --parallel=3
         displayName: Run build
       - script: pnpm exec nx-cloud stop-all-agents
         condition: always()
