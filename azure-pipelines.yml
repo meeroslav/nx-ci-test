@@ -25,14 +25,8 @@ variables:
 jobs:
   - job: agents
     strategy:
-      matrix:
-        first:
-          ordinal: 1
-        second:
-          ordinal: 2
-        third:
-          ordinal: 3
-    displayName: 'Agent $(ordinal)'
+      parallel: 3
+    displayName: 'Agent'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -41,7 +35,7 @@ jobs:
       - script: pnpm install --frozen-lockfile
         displayName: NPM Install Dependencies
       - script: pnpm exec nx-cloud start-agent
-        displayName: 'Start Nx-Cloud agent $(ordinal)'
+        displayName: 'Start Nx-Cloud agent'
 
   - job: main
     pool:
