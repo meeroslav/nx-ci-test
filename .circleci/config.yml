@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  nx: nrwl/nx@1.3.0
+  nx: nrwl/nx@1.4.0
 
 jobs:
   agent:
@@ -18,10 +18,10 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: pnpm install --frozen-lockfile
       - run:
           name: Start the agent << parameters.ordinal >>
-          command: npx nx-cloud start-agent
+          command: pnpm exec nx-cloud start-agent
           no_output_timeout: 60m
   main:
     docker:
@@ -36,30 +36,41 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: pnpm install --frozen-lockfile
       - nx/set-shas:
           main-branch-name: 'main'
       - run:
           name: Initialize the Nx Cloud distributed CI run
-          command: npx nx-cloud start-ci-run
+          command: pnpm exec nx-cloud start-ci-run
+      - run:
+          name: Run workspace lint
+          command: pnpm exec nx workspace-lint
+      - run:
+          name: Check format
+          command: pnpm exec nx format:check
       - run:
           name: Run lint
-          command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=lint --parallel=2
-      - run:
-          name: Run build
-          command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=build --parallel=2
+          command: pnpm exec nx affected --base=$NX_BASE --head=$NX_HEAD --target=lint --parallel=3
       - run:
           name: Run test
-          command: npx nx affected --base=$NX_BASE --head=$NX_HEAD --target=test --parallel=2
+          command: pnpm exec nx affected --base=$NX_BASE --head=$NX_HEAD --target=test --parallel=3 --ci --code-coverage
+      - run:
+          name: Run build
+          command: pnpm exec nx affected --base=$NX_BASE --head=$NX_HEAD --target=build --parallel=3
       - run:
           name: Stop all agents
-          command: npx nx-cloud stop-all-agents
+          command: pnpm exec nx-cloud stop-all-agents
+          when: always
 
 workflows:
-  moje-ime:
+  version: 2
+
+  build:
     jobs:
       - agent:
+          name: Agent << matrix.ordinal >>
           matrix:
             parameters:
               ordinal: [1, 2, 3]
-      - main
+      - main:
+          name: Nx Cloud Main

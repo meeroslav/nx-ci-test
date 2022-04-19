@@ -1,4 +1,4 @@
-name: moje-ime
+name: build
 
 trigger:
   - main
@@ -31,25 +31,29 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      - script: npm ci
+      - script: pnpm install --frozen-lockfile
         displayName: NPM Install Dependencies
-      - script: npx nx-cloud start-agent
+      - script: pnpm exec nx-cloud start-agent
         displayName: 'Start Nx-Cloud agent $(imageName)'
 
   - job: main
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      - script: npm ci
+      - script: pnpm install --frozen-lockfile
         displayName: NPM Install Dependencies
-      - script: npx nx-cloud start-ci-run
+      - script: pnpm exec nx-cloud start-ci-run
         displayName: Start CI run
-      - script: npx nx affected --base=$(BASE_SHA) --target=lint --parallel=3
+      - script: pnpm exec nx workspace-lint
+        displayName: Run workspace lint
+      - script: pnpm exec nx format:check
+        displayName: Check format
+      - script: pnpm exec nx affected --base=$(BASE_SHA) --target=lint --parallel=3
         displayName: Run lint
-      - script: npx nx affected --base=$(BASE_SHA) --target=build --parallel=3
-        displayName: Run build
-      - script: npx nx affected --base=$(BASE_SHA) --target=test --parallel=2
+      - script: pnpm exec nx affected --base=$(BASE_SHA) --target=test --parallel=3 --ci --code-coverage
         displayName: Run test
-      - script: npx nx-cloud stop-all-agents
+      - script: pnpm exec nx affected --base=$(BASE_SHA) --target=build --parallel=3
+        displayName: Run build
+      - script: pnpm exec nx-cloud stop-all-agents
         condition: always()
         displayName: Stop all Nx-Cloud agents
