@@ -6,7 +6,7 @@ export function App() {
   return (
     <>
       <NxWelcome title="test-app" />
-      <div />
+      <span>Trigger run 1</span>
     </>
   );
 }
