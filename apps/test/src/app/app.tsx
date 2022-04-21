@@ -5,8 +5,8 @@ import NxWelcome from './nx-welcome';
 export function App() {
   return (
     <>
-      <NxWelcome title="test-app" />
-      <span>Trigger run 2</span>
+      <NxWelcome title="test" />
+      <div />
     </>
   );
 }

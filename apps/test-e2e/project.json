@@ -1,17 +1,17 @@
 {
-  "root": "apps/test-app-e2e",
-  "sourceRoot": "apps/test-app-e2e/src",
+  "root": "apps/test-e2e",
+  "sourceRoot": "apps/test-e2e/src",
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/test-app-e2e/cypress.json",
-        "devServerTarget": "test-app:serve"
+        "cypressConfig": "apps/test-e2e/cypress.json",
+        "devServerTarget": "test:serve:development"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "test-app:serve:production"
+          "devServerTarget": "test:serve:production"
         }
       }
     },
@@ -19,10 +19,10 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/test-app-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/test-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": ["test-app"]
+  "implicitDependencies": ["test"]
 }
