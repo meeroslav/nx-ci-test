@@ -10,13 +10,10 @@ variables:
   NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
   ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
     NX_BRANCH: $(System.PullRequest.PullRequestNumber)
-  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
-    NX_BRANCH: $(Build.SourceBranchName)
-  ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
     TARGET_BRANCH: $[replace(variables['System.PullRequest.TargetBranch'],'refs/heads/','origin/')]
-  ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
     BASE_SHA: $(git merge-base $(TARGET_BRANCH) HEAD)
   ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    NX_BRANCH: $(Build.SourceBranchName)
     BASE_SHA: $(git rev-parse HEAD~1)
   HEAD_SHA: $(git rev-parse HEAD)
 
